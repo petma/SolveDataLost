@@ -1,5 +1,16 @@
-# SolveMysqlQueryLostData
-to solve data lost when query the next page in mysql
-当使用update_time去增量拉取数据时,如果在拉取第二页数据前，第一页的数据中，有可能数据更新时间已改变，导致数据丢失
-比如，我第一页，想查的订单 id为 1-500 ，第二页为500-530 在这个时间段内共有530条
-我查第一页之后，返回了1-500，第二页的时候，如果1-500中的480-490的update_time变了，我查第二页的时候，返回的就是510-530的数据，500-510的数据丢了
+问题：mysql 通过更新时间增量同步时，翻页时，可能因前面返回数据的更新时间改变，导致数据丢失
+解决方案：使用更新时间切片来解决，不使用翻页
+如何使用：
+ 
+   //不使用分页，不用order by 
+    override fun dealYourBiz(startDateTime: LocalDateTime, tempdate: LocalDateTime) {
+        val sql= "select * from orders where updated_time between '$startDateTime' and '$tempdate'  "
+        println(sql)
+    }
+
+    //按需切片
+    override fun changeTempDate(startDateTime: LocalDateTime): LocalDateTime {
+        return startDateTime.plusHours(12)
+    }
+
+
