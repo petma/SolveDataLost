@@ -1,11 +1,12 @@
 package com.cqgg.core
 
+import com.cqgg.core.exception.PullDataException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 abstract class DealByTime {
 
-    fun deal(startTime: String, endTime: String) {
+    fun deal(startTime: String, endTime: String, params: Any?) {
         val df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         var startDateTime = try {
             LocalDateTime.parse(startTime, df)
@@ -24,20 +25,32 @@ abstract class DealByTime {
             tempdate = changeTempDate(startDateTime)
             if (tempdate.isBefore(endDateTime)) {
                 println("结束时间" + df.format(tempdate))
-                dealYourBiz(startDateTime, tempdate)
+                try {
+                    dealYourBiz(startDateTime, tempdate, params)
+                } catch (e: PullDataException) {
+                    // TODO("Not yet implemented")
+                    if (e.isBreak) {
+                        break
+                    }
+                }
                 startDateTime = tempdate
 
             } else {
+                try {
+                    println("结束时间" + df.format(endDateTime))
+                    dealYourBiz(startDateTime, endDateTime, params)
+                } catch (e: PullDataException) {
+                    // TODO("Not yet implemented")
 
-                println("结束时间" + df.format(endDateTime))
-                dealYourBiz(startDateTime, endDateTime)
+                }
                 break
             }
 
         }
     }
 
-    abstract fun dealYourBiz(startDateTime: LocalDateTime, tempdate: LocalDateTime)
+    abstract fun dealYourBiz(startDateTime: LocalDateTime, tempdate: LocalDateTime, params: Any?)
+
     //todo implement
     open fun changeTempDate(startDateTime: LocalDateTime): LocalDateTime {
         return startDateTime.plusHours(4)

@@ -4,7 +4,7 @@ import com.cqgg.core.DealByTime
 import java.time.LocalDateTime
 
 class Mybiz: DealByTime() {
-    override fun dealYourBiz(startDateTime: LocalDateTime, tempdate: LocalDateTime) {
+    override fun dealYourBiz(startDateTime: LocalDateTime, tempdate: LocalDateTime, params: Any?) {
         val sql= "select * from orders where updated_time between '$startDateTime' and '$tempdate'  "
         println(sql)
     }
